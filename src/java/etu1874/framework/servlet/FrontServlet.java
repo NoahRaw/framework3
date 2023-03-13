@@ -5,7 +5,10 @@
  */
 package etu1874.framework.servlet;
 
+import etu1874.framework.ClassIdentifier;
+import etu1874.framework.Mapping;
 import etu1874.framework.Utilitaire;
+import static etu1874.framework.Utilitaire.getClasses2;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -14,6 +17,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,6 +27,8 @@ import java.util.logging.Logger;
  */
 @WebServlet(name = "FrontServlet", urlPatterns = {"/*"})
 public class FrontServlet extends HttpServlet {
+    HashMap<String, Mapping> mappingUrls;
+    List<Class<?>> lc;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -45,7 +51,9 @@ public class FrontServlet extends HttpServlet {
             out.println("<body>");
 //            out.println("<h1>Servlet FrontServlet at " + request.getContextPath() + "</h1>");
 //            out.println("<h1>url " + Utilitaire.infoUrl(request.getRequestURL().toString(), "http://localhost:8080/Framework/")+ "</h1>");
-            out.println("<h1>url " + Utilitaire.infoUrl2(request.getPathInfo())+ "</h1>");
+            out.println("<p>url: " + Utilitaire.infoUrl2(request.getPathInfo())+ "</p>");
+            out.println("<p>class Name: " +Utilitaire.findMethodsAnnotatedWith(lc, Utilitaire.infoUrl2(request.getPathInfo()))[0] + "</p>");
+            out.println("<p>foncttion Name: " +Utilitaire.findMethodsAnnotatedWith(lc, Utilitaire.infoUrl2(request.getPathInfo()))[1] + "</p>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -97,5 +105,16 @@ public class FrontServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+    
+    public void init() throws ServletException 
+    {
+        try {
+            lc=getClasses2("etu1874.framework");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(FrontServlet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(FrontServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
 }
