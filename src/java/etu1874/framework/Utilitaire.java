@@ -5,11 +5,22 @@
  */
 package etu1874.framework;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+
 /**
  *
  * @author ITU
  */
 public class Utilitaire {
+    @ClassIdentifier(id = "infoUrl")
     public static String infoUrl(String url, String nomDomaine) throws Exception {
         int index = url.indexOf(nomDomaine);
         if (index == -1) {
@@ -36,6 +47,80 @@ public class Utilitaire {
     
     public static void main(String[] args) throws Exception
     {
-        System.out.println(infoUrl("http://localhost:8080/Framework/pizza/porno?cullote", "http://localhost:8080/Framework/"));
+        System.out.println(getClasses2("etu1874.framework").size());
+    }
+    
+    public static List<Class<?>> getClasses2(String packageName) throws ClassNotFoundException, IOException {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        String path = packageName.replace('.', '/');
+        Enumeration<URL> resources = classLoader.getResources(path);
+        List<File> dirs = new ArrayList<>();
+        while (resources.hasMoreElements()) {
+            URL resource = resources.nextElement();
+            dirs.add(new File(resource.getFile()));
+        }
+        List<Class<?>> classes = new ArrayList<>();
+        for (File directory : dirs) {
+            classes.addAll(findClasses(directory, packageName));
+        }
+        return classes;
+    }
+
+    private static List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException {
+        List<Class<?>> classes = new ArrayList<>();
+        if (!directory.exists()) {
+            return classes;
+        }
+        File[] files = directory.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                assert !file.getName().contains(".");
+                classes.addAll(findClasses(file, packageName + "." + file.getName()));
+            } else if (file.getName().endsWith(".class")) {
+                String className = packageName + '.' + file.getName().substring(0, file.getName().length() - 6);
+                classes.add(Class.forName(className));
+            }
+        }
+        return classes;
+    }
+    
+//    public static String[] findMethodsAnnotatedWith(String packageName, String annotationValue) throws ClassNotFoundException, IOException, URISyntaxException, Exception {
+//        List<String[]> result = new ArrayList<>();
+//        for (Class<?> clazz : getClasses2(packageName)) {
+//            for (Method method : clazz.getDeclaredMethods()) {
+//                if (method.isAnnotationPresent(ClassIdentifier.class)) {
+//                    Annotation annotation = method.getAnnotation(ClassIdentifier.class);
+//                    if (annotation instanceof ClassIdentifier && ((ClassIdentifier) annotation).id().equals(annotationValue)) {
+//                        String[] methodInfo = new String[2];
+//                        methodInfo[0] = clazz.getName();
+//                        methodInfo[1] = method.getName();
+//                        result.add(methodInfo);
+//                    }
+//                }
+//            }
+//        }
+//        if(result.size()>0)
+//            return result.get(0);
+//        throw new Exception("la methode n'existe pas");
+//    }
+    
+    public static String[] findMethodsAnnotatedWith(List<Class<?>> classes, String annotationValue) throws ClassNotFoundException, IOException, URISyntaxException, Exception {
+        List<String[]> result = new ArrayList<>();
+        for (Class<?> clazz : classes) {
+            for (Method method : clazz.getDeclaredMethods()) {
+                if (method.isAnnotationPresent(ClassIdentifier.class)) {
+                    Annotation annotation = method.getAnnotation(ClassIdentifier.class);
+                    if (annotation instanceof ClassIdentifier && ((ClassIdentifier) annotation).id().equals(annotationValue)) {
+                        String[] methodInfo = new String[2];
+                        methodInfo[0] = clazz.getName();
+                        methodInfo[1] = method.getName();
+                        result.add(methodInfo);
+                    }
+                }
+            }
+        }
+        if(result.size()>0)
+            return result.get(0);
+        throw new Exception("la methode n'existe pas");
     }
 }
