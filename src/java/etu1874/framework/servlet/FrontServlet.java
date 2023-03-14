@@ -5,6 +5,7 @@
  */
 package etu1874.framework.servlet;
 
+import etu1874.framework.Mapping;
 import etu1874.framework.Utilitaire;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,6 +24,7 @@ import java.util.logging.Logger;
  */
 @WebServlet(name = "FrontServlet", urlPatterns = {"/*"})
 public class FrontServlet extends HttpServlet {
+    HashMap<String, Mapping> mappingUrls;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
