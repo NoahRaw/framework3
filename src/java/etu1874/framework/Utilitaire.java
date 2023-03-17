@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -43,11 +44,6 @@ public class Utilitaire {
     
     public static String infoUrl2(String url) throws Exception {
           return url.substring(1,url.length());
-    }
-    
-    public static void main(String[] args) throws Exception
-    {
-        System.out.println(getClasses2("etu1874.framework").size());
     }
     
     public static List<Class<?>> getClasses2(String packageName) throws ClassNotFoundException, IOException {
@@ -122,5 +118,52 @@ public class Utilitaire {
         if(result.size()>0)
             return result.get(0);
         throw new Exception("la methode n'existe pas");
+    }
+    
+    public static int[] mamadikaTableauInt(int[] listInt,int indiceVoloany)
+    {
+        int[] listIntVaovao=new int[listInt.length];
+        int j=0;
+        int k=0;
+        for(int i=indiceVoloany;i<listInt.length+indiceVoloany;i++)
+        {
+            if(i>=listInt.length)
+            {
+                listIntVaovao[j]=listInt[k];
+                k++;
+            }
+            else
+                listIntVaovao[j]=listInt[i];
+            j++;
+        }
+        return listIntVaovao;
+    }
+    
+    public static void main(String[] args) throws Exception
+    {
+        int[] list=new int[4];
+        list[0]=1;
+        list[1]=2;
+        list[2]=3;
+        list[3]=4;
+        int[] listVaovao=Utilitaire.mamadikaTableauInt(list, 2);
+        
+        for(int i=0;i<listVaovao.length;i++)
+            System.out.println("l["+i+"]="+listVaovao[i]);
+    }
+    
+    public static HashMap<String,Mapping> getAnnotatedMethods(String packageName, Class<? extends Annotation> annotationClass) throws ClassNotFoundException, IOException {
+        List<Class<?>> classes = getClasses2(packageName);
+        HashMap<String,Mapping> annotatedMethods = new HashMap<String,Mapping>();
+        for (Class<?> cls : classes) {
+            Method[] methods = cls.getDeclaredMethods();
+            for (Method method : methods) {
+                Annotation annotation = method.getAnnotation(annotationClass);
+                if (annotation != null) {
+                    annotatedMethods.put(((ClassIdentifier) annotation).id(), new Mapping( cls.getName(), method.getName()));
+                }
+            }
+        }
+        return annotatedMethods;
     }
 }
