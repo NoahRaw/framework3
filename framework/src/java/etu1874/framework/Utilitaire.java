@@ -139,11 +139,27 @@ public class Utilitaire {
         return listeParmetre;
     }
     
-    public static ModelView getAssociatedView(Mapping map) throws Exception, IllegalAccessException, ClassNotFoundException, InstantiationException, InvocationTargetException
+    public static ModelView getAssociatedView(Mapping map,Object o,Object[] listParametre) throws Exception, IllegalAccessException, ClassNotFoundException, InstantiationException, InvocationTargetException
     {
-        Object o=Class.forName(map.getClassName()).newInstance();
         Method m=Utilitaire.searchMethod(o.getClass().getMethods(),map.getMethod());;
-        ModelView mv=(ModelView)m.invoke(o,null);
+        ModelView mv=(ModelView)m.invoke(o,listParametre);
         return mv;
     }
+    
+    public static String[] get_parameters_name(Method method) throws Exception {
+    Annotation[][] annotations = method.getParameterAnnotations();
+    String[] result=new String[method.getParameterCount()];
+
+    for (int i = 0; i < annotations.length; i++) {
+      for (Annotation annotation : annotations[i]) {
+        if (annotation instanceof Param) {
+          Param param = (Param) annotation;
+           result[i]=param.value();
+        }
+      }
+    }
+    
+    return result;
+    }
 }
+    
