@@ -10,18 +10,20 @@ import etu1874.framework.Mapping;
 import etu1874.framework.ModelView;
 import etu1874.framework.Utilitaire;
 import static etu1874.framework.Utilitaire.getClasses2;
-import jakarta.servlet.RequestDispatcher;
+import javax.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.logging.Logger;
 
 /**
@@ -45,9 +47,39 @@ public class FrontServlet extends HttpServlet {
             throws ServletException, IOException, Exception {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            
+//            out.print(Utilitaire.infoUrl2(request.getPathInfo()));
             Mapping m=Utilitaire.findInHashMap(mappingUrls, Utilitaire.infoUrl2(request.getPathInfo()));
-            ModelView mv=Utilitaire.getAssociatedView(m);
+            
+            //set Object from formulaire
+            Object o=Class.forName(m.getClassName()).newInstance();;
+            for(int i=1;i<getClass().getDeclaredFields().length;i++)
+            {
+                String me="set".concat(String.valueOf(o.getClass().getDeclaredFields()[i].getName().charAt(0)).toUpperCase().concat(o.getClass().getDeclaredFields()[i].getName().substring(1)));
+                Method method=Utilitaire.searchMethod(o.getClass().getMethods(),me);
+                
+                String type=o.getClass().getDeclaredFields()[i].getType().getSimpleName();
+                String value="";
+                if(request.getParameter(String.valueOf(o.getClass().getDeclaredFields()[i].getName()))!=null){
+                    value=(String)request.getParameter(String.valueOf(o.getClass().getDeclaredFields()[i].getName()));
+                    method.invoke(o,Utilitaire.getValue(type,value));    
+                }
+//                out.print(me+"="+value);
+            }
+            
+            //recuperation des noms de l'argument du fonction
+            Method method=Utilitaire.searchMethod(o.getClass().getMethods(),m.getMethod());
+                Parameter[] parameters = method.getParameters();
+                String[] parameterNames = Utilitaire.get_parameters_name(method);
+                
+//                tableau d'objet pour la liste des parametres
+                Object[] listParametre=new Object[parameterNames.length]; 
+                
+                for (int j = 0; j < parameterNames.length; j++) {
+                    listParametre[j]=request.getParameter(parameterNames[j]);
+                    out.println(parameterNames[j]);
+                }
+            
+            ModelView mv=Utilitaire.getAssociatedView(m,o,listParametre);
             RequestDispatcher dispat = request.getRequestDispatcher("/"+mv.getVue());
             HashMap<String, Object> data=mv.getData();
             
@@ -60,6 +92,7 @@ public class FrontServlet extends HttpServlet {
                 // Initialisation de la variable de requête correspondante
                 request.setAttribute(key, value);
             }
+            out.print("vita:"+mv.getVue());
             
             dispat.forward(request,response); 
         }
