@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="test.*"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -13,5 +14,9 @@
     </head>
     <body>
         <h1>test:<%= request.getAttribute("test") %></h1>
+        <%
+            Emp e=(Emp)request.getAttribute("emp");
+        %>
+        <h1>nom:<%= e.getNom() %></h1>
     </body>
 </html>
