@@ -6,6 +6,7 @@
 package etu1874.framework.servlet;
 
 import etu1874.framework.ClassIdentifier;
+import etu1874.framework.FileUpload;
 import etu1874.framework.Mapping;
 import etu1874.framework.ModelView;
 import etu1874.framework.Utilitaire;
@@ -24,13 +25,19 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.logging.Logger;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.http.Part;
 
 /**
  *
  * @author ITU
  */
 @WebServlet(name = "FrontServlet", urlPatterns = {"/*"})
+@MultipartConfig(maxFileSize = 2000000)
 public class FrontServlet extends HttpServlet {
     HashMap<String, Mapping> mappingUrls;
     String packageName;
@@ -46,13 +53,31 @@ public class FrontServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, Exception {
         response.setContentType("text/html;charset=UTF-8");
+            try{
+                Part filePart = request.getPart("file");
+                if(filePart!=null){
+                    String fileName = filePart.getSubmittedFileName();
+
+                    // Lire les données du fichier et les stocker dans un tableau de bytes
+                    byte[] fileBytes = new byte[(int) filePart.getSize()];
+                    filePart.getInputStream().read(fileBytes);
+
+                    Utilitaire.saveToFile(fileBytes, "E:\\"+fileName);
+
+                    FileUpload fileUpload=new FileUpload(fileName,"",fileBytes);
+                }
+            }
+            catch(Exception ei)
+            {
+                
+            }
         try (PrintWriter out = response.getWriter()) {
-//            out.print(Utilitaire.infoUrl2(request.getPathInfo()));
+            out.print(Utilitaire.infoUrl2(request.getPathInfo()));
             Mapping m=Utilitaire.findInHashMap(mappingUrls, Utilitaire.infoUrl2(request.getPathInfo()));
             
             //set Object from formulaire
             Object o=Class.forName(m.getClassName()).newInstance();;
-            for(int i=1;i<getClass().getDeclaredFields().length;i++)
+            for(int i=0;i<getClass().getDeclaredFields().length;i++)
             {
                 String me="set".concat(String.valueOf(o.getClass().getDeclaredFields()[i].getName().charAt(0)).toUpperCase().concat(o.getClass().getDeclaredFields()[i].getName().substring(1)));
                 Method method=Utilitaire.searchMethod(o.getClass().getMethods(),me);
@@ -95,6 +120,12 @@ public class FrontServlet extends HttpServlet {
             out.print("vita:"+mv.getVue());
             
             dispat.forward(request,response); 
+
+        for (Map.Entry<String, Mapping> entry : mappingUrls.entrySet()) {
+            String key = entry.getKey();
+            Mapping value = entry.getValue();
+            out.print(key+" "+value.getClassName()+" "+value.getMethod());
+        }
         }
     }
 

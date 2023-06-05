@@ -18,6 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import etu1874.framework.*;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 
 /**
  *
@@ -160,6 +163,24 @@ public class Utilitaire {
     }
     
     return result;
+    }
+    
+    //sauvegarder le fichier uploder
+    public static void saveToFile(byte[] data, String filePath) throws IOException {
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(filePath);
+            fos.write(data);
+        } finally {
+            if (fos != null) {
+                fos.close();
+            }
+        }
+        
+//        int count; 
+//        byte buf[] = new byte[4096];
+//        while ((count = is.read(buf)) > -1) 
+//            os.write(buf, 0, count); 
     }
 }
     
