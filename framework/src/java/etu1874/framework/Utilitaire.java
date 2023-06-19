@@ -139,6 +139,10 @@ public class Utilitaire {
         {
             listeParmetre[0]=value;
         }
+        if(type.equalsIgnoreCase("null"))
+        {
+            listeParmetre[0]=value;
+        }
         return listeParmetre;
     }
     
@@ -176,11 +180,48 @@ public class Utilitaire {
                 fos.close();
             }
         }
-        
-//        int count; 
-//        byte buf[] = new byte[4096];
-//        while ((count = is.read(buf)) > -1) 
-//            os.write(buf, 0, count); 
+    }
+    
+    //recuperer l'instance d'un objet dans le hashMap
+    public static Object getObjectSingleton(HashMap<String,Object> singletonObject,String className) throws Exception
+    {
+        for (Map.Entry<String, Object> entry : singletonObject.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            if(key.equalsIgnoreCase(className)){
+                if(value==null)
+                    value=Class.forName(className).newInstance();
+                return value;
+            }
+        }
+        throw new Exception("cette classe n'est pas un singleton");
+    }
+    
+    //determine si une classe est singleton
+    public static boolean isObjectSingleton(HashMap<String,Object> singletonObject,String className) throws Exception
+    {
+        for (Map.Entry<String, Object> entry : singletonObject.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            if(key.equalsIgnoreCase(className)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    //recuperer les classes singleton
+    public static HashMap<String,Object> getSingletonClasses(String packageName, Class<? extends Annotation> annotationClass) throws ClassNotFoundException, IOException {
+        List<Class<?>> classes = getClasses2(packageName);
+        HashMap<String,Object> annotatedMethods = new HashMap<String,Object>();
+        for (Class<?> cls : classes) {
+                Annotation annotation = cls.getAnnotation(annotationClass);
+                if (annotation != null) {
+                    if(((Scop)annotation).value().equalsIgnoreCase("singleton"))
+                        annotatedMethods.put(cls.getName(), null);
+                }
+        }
+        return annotatedMethods;
     }
 }
     
