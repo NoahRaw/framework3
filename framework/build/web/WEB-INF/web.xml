@@ -3,11 +3,25 @@
     <servlet>
         <servlet-name>FrontServlet</servlet-name>
         <servlet-class>etu1874.framework.servlet.FrontServlet</servlet-class>
+        
         <init-param> 
             <param-name>packageName</param-name> 
             <param-value>etu1874</param-value> 
             <description>Nom du package</description> 
         </init-param> 
+        
+        <init-param> 
+            <param-name>isConnected</param-name> 
+            <param-value>isConnected</param-value> 
+            <description>key pour le hashmap qui determine si une personne est connecte</description> 
+        </init-param>
+        
+        <init-param> 
+            <param-name>Admin</param-name> 
+            <param-value>admin</param-value> 
+            <description>key pour le hashmap qui determine le profil d'une personne</description> 
+        </init-param>
+        
     </servlet>
     <servlet-mapping>
         <servlet-name>FrontServlet</servlet-name>

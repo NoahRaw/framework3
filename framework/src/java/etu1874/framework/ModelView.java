@@ -14,6 +14,21 @@ import java.util.HashMap;
 public class ModelView {
     String vue;
     HashMap<String, Object> data;
+    HashMap<String, Object> session;
+
+    public ModelView(String vue, HashMap<String, Object> data, HashMap<String, Object> session) {
+        this.vue = vue;
+        this.data = data;
+        this.session = session;
+    }
+
+    public HashMap<String, Object> getSession() {
+        return session;
+    }
+
+    public void setSession(HashMap<String, Object> session) {
+        this.session = session;
+    }
 
     public HashMap<String, Object> getData() {
         return data;
