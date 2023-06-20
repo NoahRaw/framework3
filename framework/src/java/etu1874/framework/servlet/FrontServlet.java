@@ -84,13 +84,6 @@ public class FrontServlet extends HttpServlet {
         
         //initialiser l'objet qui appelle la classe
         try (PrintWriter out = response.getWriter()) {
-            //afficher les classe
-            for (Map.Entry<String, Object> entry : singletonObject.entrySet()) {
-            String key = entry.getKey();
-            out.println("classe = "+key);
-        }
-            
-            out.print(Utilitaire.infoUrl2(request.getPathInfo()));
             Mapping m=Utilitaire.findInHashMap(mappingUrls, Utilitaire.infoUrl2(request.getPathInfo()));
                 
             Object o=new Object();
@@ -116,7 +109,6 @@ public class FrontServlet extends HttpServlet {
             
             
 //            attribution des valeurs des attributs de l'objet ou se trouve la fonction appelez via le lien
-            
         if(isFonctionAccessible(Utilitaire.searchMethod(o.getClass().getMethods(),m.getMethod()))==true){
             for(int i=0;i<o.getClass().getDeclaredFields().length;i++)
             {
@@ -171,6 +163,10 @@ public class FrontServlet extends HttpServlet {
                 }
                 dispat.forward(request,response);
             }
+        else
+        {
+            out.print("vous n'avez pas acces a ce methode");
+        }
         }
     }
     
@@ -182,14 +178,17 @@ public class FrontServlet extends HttpServlet {
                     return true;
                 }
                 
-                if((boolean)mappingSession.get(isConnected)==true)
+                if(mappingSession!=null)
                 {
-                    String annotationValue=((Scop)annotation).value();
-                    String profilValue=(String)mappingSession.get(profil);
-                    if(annotationValue.equalsIgnoreCase(profilValue))
-                        return true;
+                    if((boolean)mappingSession.get(isConnected)==true)
+                    {
+                        String annotationValue=((Auth)annotation).profil();
+                        String profilValue=(String)mappingSession.get(profil);
+                        if(annotationValue.equalsIgnoreCase(profilValue))
+                            return true;
+                    }
                 }
-        throw new Exception("vous n'avez pas acces a cette fonctioin");
+        return false;
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
