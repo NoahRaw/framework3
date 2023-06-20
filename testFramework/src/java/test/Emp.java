@@ -80,7 +80,7 @@ public class Emp{
     {
         ModelView m=new ModelView("connecte.jsp");
         
-        HashMap<String, Object> session = null;
+        HashMap<String, Object> session = new HashMap<String, Object>();
         session.put("isConnected",true);
         session.put("profile","admin");
         m.setSession(session);
