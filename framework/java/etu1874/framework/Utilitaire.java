@@ -77,6 +77,16 @@ public class Utilitaire {
         return mv;
     }
     
+    public static boolean isMethodAnnoteJson(Mapping map,Object o) throws Exception, IllegalAccessException, ClassNotFoundException, InstantiationException, InvocationTargetException
+    {
+        Method m=Utilitaire.searchMethod(o.getClass().getMethods(),map.getMethod());;
+        Annotation annotation = m.getAnnotation(JsonAnnotation.class);
+        if(annotation!=null)
+            if(((JsonAnnotation)annotation).isJson()==true)
+                return true;
+        return false;
+    }
+    
     public static String[] get_parameters_name(Method method) throws Exception {
     Annotation[][] annotations = method.getParameterAnnotations();
     String[] result=new String[method.getParameterCount()];
@@ -200,6 +210,7 @@ public class Utilitaire {
         return enregistrement;
     }
     
+    @JsonAnnotation(isJson = true)
     public static HashMap<String,Mapping> listeHashMapAllClass(String pathProjet) throws ClassNotFoundException{
         Vector<String> allClasse=listeClasse(pathProjet);
         HashMap<String,Mapping> newmap=new HashMap<String,Mapping>(); 
@@ -212,6 +223,13 @@ public class Utilitaire {
             }
         }
         return newmap;
+    }
+    
+    public static void main(String[] args) throws Exception
+    {
+        Mapping map=new Mapping("Utilitaire", "listeClasse");
+        Utilitaire u=new Utilitaire();
+        System.out.println(Utilitaire.isMethodAnnoteJson(map, u));
     }
 }
     

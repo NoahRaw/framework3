@@ -8,6 +8,7 @@ package test;
 import etu1874.framework.Auth;
 import etu1874.framework.ClassIdentifier;
 import etu1874.framework.FileUpload;
+import etu1874.framework.JsonAnnotation;
 import etu1874.framework.ModelView;
 import etu1874.framework.Param;
 import etu1874.framework.Scop;
@@ -111,6 +112,18 @@ public class Emp{
         m.ajouterElement("emp", this);
         m.ajouterElement("test", test);
         m.setIsJson(true);
+        return m;
+    }
+    
+    @JsonAnnotation(isJson = true)
+    @ClassIdentifier(id="/json2.do")
+    @Auth(profil="admin")
+    public ModelView json2(@Param("test") String test) throws IOException
+    {
+        ModelView m=new ModelView("resutat.jsp");
+        m.ajouterElement("emp", this);
+        m.ajouterElement("emp", this);
+        m.ajouterElement("test", test);
         return m;
     }
 }
