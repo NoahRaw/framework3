@@ -102,7 +102,6 @@ public class FrontServlet extends HttpServlet {
                         method.invoke(o,Utilitaire.getValue(type,value));    
                     }
                 }
-                out.print("etape1");
             } else {
                 o=Class.forName(m.getClassName()).newInstance();
             }
@@ -153,7 +152,21 @@ public class FrontServlet extends HttpServlet {
             
             
                 // Parcours du HashMap data du model view
-                if(!modelView.isIsJson()){
+                if(Utilitaire.isMethodAnnoteJson(m,o))
+                {
+                    Gson gson = new Gson();
+                    for (Map.Entry<String, Object> entry : data.entrySet()) {
+                        // Récupération de la clé et de la valeur correspondante
+                        String key = entry.getKey();
+                        Object value = entry.getValue();
+
+                        // Initialisation de la variable de requête correspondante
+                        out.println("Format json pour "+key+" :");
+                        String json = gson.toJson(value);
+                        out.println(json);
+                    }
+                }
+                else if(!modelView.isIsJson()){
                     for (Map.Entry<String, Object> entry : data.entrySet()) {
                         // Récupération de la clé et de la valeur correspondante
                         String key = entry.getKey();
@@ -164,7 +177,7 @@ public class FrontServlet extends HttpServlet {
                     }
                     dispat.forward(request,response);
                 }
-                else
+                else 
                 {
                     Gson gson = new Gson();
                     for (Map.Entry<String, Object> entry : data.entrySet()) {
